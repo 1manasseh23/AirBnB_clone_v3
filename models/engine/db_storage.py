@@ -64,22 +64,12 @@ class DBStorage:
         :param cls: class name
         :return: count of instances of a class
         """
-        return len(self.all(cls))
-        """
-            Count num objects in DBstorage
-        
-        cls_counter = 0
-
-        if cls is not None:
-            objs = self.__session.query(models.classes[cls]).all()
-            cls_counter = len(objs)
+        # return len(self.all(cls))
+        if cls:
+            return self.session.query(cls).count()
         else:
-            for k, v in models.classes.items():
-                if k != "BaseModel":
-                    objs = self.__session.query(models.classes[k]).all()
-                    cls_counter += len(objs)
-        return cls_counter
-        """
+            return self.session.query(Base).count()
+
     def all(self, cls=None):
         """query on the current database session"""
         new_dict = {}
