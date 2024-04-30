@@ -40,6 +40,46 @@ class DBStorage:
         if HBNB_ENV == "test":
             Base.metadata.drop_all(self.__engine)
 
+    def get(self, cls, id):
+        """
+        Retrieves one object based on the class and its ID.
+        Args:
+            cls (class): The class of the object to retrieve.
+        id (str):
+            The ID of the object to retrieve.
+        Returns:
+            The object based on the class and its ID, or None if not found.
+        """
+        if cls and id:
+            try:
+                obj = self.session.query(cls).filter_by(id=id).one()
+                return obj
+            except:
+                return None
+        return None
+    
+    def count(self, cls=None):
+        """
+        count of how many instances of a class
+        :param cls: class name
+        :return: count of instances of a class
+        """
+        return len(self.all(cls))
+        """
+            Count num objects in DBstorage
+        
+        cls_counter = 0
+
+        if cls is not None:
+            objs = self.__session.query(models.classes[cls]).all()
+            cls_counter = len(objs)
+        else:
+            for k, v in models.classes.items():
+                if k != "BaseModel":
+                    objs = self.__session.query(models.classes[k]).all()
+                    cls_counter += len(objs)
+        return cls_counter
+        """
     def all(self, cls=None):
         """query on the current database session"""
         new_dict = {}
@@ -63,14 +103,24 @@ class DBStorage:
         """delete from the current database session obj if not None"""
         if obj is not None:
             self.__session.delete(obj)
+            
+    @property
+    def session(self):
+        return self.__session
 
     def reload(self):
-        """reloads data from the database"""
+        Base.metadata.create_all(self.__engine)
+        Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = Session()
+    """
+    def reload(self):
+        reloads data from the database
         Base.metadata.create_all(self.__engine)
         sess_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(sess_factory)
         self.__session = Session
-
+    """
     def close(self):
         """call remove() method on the private session attribute"""
-        self.__session.remove()
+        # self.__session.remove()
+        self.session.close()

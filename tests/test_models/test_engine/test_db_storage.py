@@ -30,6 +30,23 @@ class TestDBStorageDocs(unittest.TestCase):
         """Set up for the doc tests"""
         cls.dbs_f = inspect.getmembers(DBStorage, inspect.isfunction)
 
+    def test_get_method(self):
+        """Test the get() method of DBStorage"""
+        state = State(name="California")
+        state.save()
+        obj = storage.get(State, state.id)
+        self.assertEqual(obj.id, state.id)
+        self.assertEqual(obj.name, state.name)
+
+    def test_count_method(self):
+        """Test the count() method of DBStorage"""
+        self.assertEqual(storage.count(), 1)
+        self.assertEqual(storage.count(State), 1)
+        City(name="San Francisco").save()
+        self.assertEqual(storage.count(), 2)
+        self.assertEqual(storage.count(State), 1)
+        self.assertEqual(storage.count(City), 1)
+
     def test_pep8_conformance_db_storage(self):
         """Test that models/engine/db_storage.py conforms to PEP8."""
         pep8s = pep8.StyleGuide(quiet=True)
