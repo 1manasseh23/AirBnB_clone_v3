@@ -13,6 +13,7 @@ app.register_blueprint(app_views)
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+
 @app.teardown_appcontext
 def close_db(exception):
     """
